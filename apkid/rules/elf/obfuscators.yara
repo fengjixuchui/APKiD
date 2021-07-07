@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  RedNaga. https://rednaga.io
+ * Copyright (C) 2021  RedNaga. https://rednaga.io
  * All rights reserved. Contact: rednaga@protonmail.com
  *
  *
@@ -387,4 +387,56 @@ rule snapprotect : obfuscator
 
   condition:
     is_elf and 1 of ($a,$b)
+}
+
+rule safeengine : obfuscator
+{
+  meta:
+    description = "Safeengine LLVM"
+    url         = "https://bbs.pediy.com/thread-195327.htm"
+    sample      = "93ec9a03b76fa359a7706aed0682003b76bca971e96462540fddad297817049b"
+    author      = "horsicq"
+
+  strings:
+    // "Safengine clang version 3.8.0 (trunk 608) (based on LLVM 3.8.0svn)"
+    //$clang_version = \0"Safengine clang version "
+    $clang_version = { 00 53 61 66 65 6e 67 69 6e 65 20 63 6c 61 6e 67 20 76 65 72 73 69 6f 6e 20 }
+    $based_on      = "(based on LLVM "
+
+  condition:
+    all of them and is_elf
+}
+
+rule hikari : obfuscator
+{
+  meta:
+    description = "Hikari"
+    sample      = "f6b936ab06ade3de189a0cf11964f77ea3a6ad081cfd8cc4580cc87bcd7dec70"
+    url         = "https://github.com/HikariObfuscator/Hikari"
+    author      = "Eduardo Novella"
+
+  strings:
+    // clang version 8.0.0 (tags/RELEASE_800/final) (https://gitee.com/chenzimo/Hikari.git ecdf30fa1a4635a76c3b528a41eb48d791f4be95)
+    $version = /clang version \d+\.\d+\.\d+ \(.*\) \(.*\/Hikari\.git [0-9a-f]{40}\)/
+
+  condition:
+    is_elf and all of them
+}
+
+rule dexprotector : obfuscator
+{
+  meta:
+    description = "DexProtector"
+    url         = "https://dexprotector.com/"
+    sample      = "d506e22003798f8b3a3d3c4a1b08af1cbd64667da6f9ed8cf73bc99ded73da44"
+    author      = "Eduardo Novella"
+
+  strings:
+    // - offset -   0 1  2 3  4 5  6 7  8 9  A B  C D  E F  0123456789ABCDEF
+    // 0x00000000  7f45 4c46 0201 0100 4450 4c46 00e0 0100  .ELF....DPLF....
+    // Possibly DPLF stands for "DexProtector Linkable Format"
+    $dp_elf_header = { 7f45 4c46 0201 0100 4450 4c46 }
+
+  condition:
+    $dp_elf_header at 0
 }

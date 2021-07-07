@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  RedNaga. https://rednaga.io
+ * Copyright (C) 2021  RedNaga. https://rednaga.io
  * All rights reserved. Contact: rednaga@protonmail.com
  *
  *
@@ -52,8 +52,9 @@ rule appguard_a : packer
   strings:
     $a = "assets/AppGuard0.jar"
     $b = "assets/AppGuard.dgc"
-    $c = "libAppGuard.so"
-    $d = "libAppGuard-x86.so"
+    $c = "lib/arm64-v8a/libAppGuard.so"
+    $d = "lib/armeabi-v7a/libAppGuard.so"
+    $e = "libAppGuard-x86.so"
 
   condition:
     is_apk and 3 of them
@@ -81,6 +82,8 @@ rule appguard_b : packer
     $b2 = "lib/x86/libloader.so"
     $b3 = "lib/armeabi-v7a/libdiresu.so"
     $b4 = "lib/x86/libdiresu.so"
+    $b5 = "lib/arm64-v8a/libloader.so"
+    $b6 = "lib/arm64-v8a/libdiresu.so"
     $c1 = "assets/m7a"
     $c2 = "assets/m8a"
     $c3 = "assets/agconfig"    //appguard cfg?
@@ -156,12 +159,16 @@ rule dexprotector : packer
     $encrptlib_3 = "assets/dp.arm-v8.so.dat"
     $encrptlib_4 = "assets/dp.x86.so.dat"
     $encrptlib_5 = "assets/dp.x86_64.so.dat"
-    $encrptlib_6 = "assets/classes.dex.dat"
 
-    $encrptcustom = "assets/dp.mp3"
+    $asset1 = "assets/classes.dex.dat"
+    $asset2 = "assets/classes1.dex.dat"
+    $asset3 = "assets/classes2.dex.dat"
+    $asset4 = "assets/classes3.dex.dat"
+    $asset5 = "assets/resources.dat"
+    $asset6 = "assets/dp.mp3"
 
   condition:
-    is_apk and 1 of ($encrptlib_*) and $encrptcustom
+    is_apk and 1 of ($encrptlib_*) and 1 of ($asset*)
 }
 
 rule dexprotector_a : packer
@@ -188,7 +195,7 @@ rule dexprotector_a : packer
     $encrptcustom = "assets/dp.mp3"
 
   condition:
-    is_apk and 2 of ($encrptlib_*) and $encrptcustom
+    is_apk and 2 of them
 }
 
 rule dexprotector_b : packer
@@ -200,6 +207,7 @@ rule dexprotector_b : packer
     description = "DexProtector"
     url         = "https://dexprotector.com/"
     sample      = "dca2a0bc0f2605072b9b48579e73711af816b0fa1108b825335d2d1f2418e2a7"
+    sample2     = "353f5fa432208f67cdc106c08b19f2c8644a5f768a7051f7c9043d9931a2a116"
 
   strings:
     //              assets/com.package.name.arm.so.dat
@@ -213,7 +221,7 @@ rule dexprotector_b : packer
     $encrptcustom = /assets\/[A-Za-z0-9.]{2,50}\.mp3/
 
   condition:
-    is_apk and 2 of ($encrptlib_*) and $encrptcustom and
+    is_apk and 1 of ($encrptlib_*) and $encrptcustom and
     not dexprotector_a and
     not dexprotector
 }
@@ -731,7 +739,7 @@ rule tencent_legu : packer
     author      = "Mert Arıkan"
 
   strings:
-    $a = "assets/toversion"
+    $a = "assets/tosversion"
     $b = "assets/0OO00l111l1l"
     $c = "assets/0OO00oo01l1l"
     $d = "assets/o0oooOO0ooOo.dat"
